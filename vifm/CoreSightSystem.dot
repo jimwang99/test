@@ -1,0 +1,74 @@
+digraph CoreSightSystem {
+graph [ rankdir = "LR" ];
+label = "CoreSight Discovery Test output - ROM Table Structure";
+labelloc = "t";
+node [ style = filled fontname = "Courier New" shape = "Mrecord" ];
+subgraph cluster_key {
+label = "Key";
+key0 [fillcolor="lightblue", label="DP"];
+key1 [fillcolor="lightblue", label="MEMAP"];
+key2 [fillcolor="lightblue", label="JTAGAP"];
+key3 [fillcolor="lightyellow", label="ROM Table"];
+key4 [fillcolor="orchid", label="GPR"];
+key5 [fillcolor="lightblue", label="CPU"];
+key6 [fillcolor="lightpink", label="***WARNING***"];
+key7 [fillcolor="palevioletred", label="***ERROR***"];
+}
+inst_0 [label="{inst_0 | DEBUGTESTER | \"CXDT\" | PowerDomain 0 \"Always On\" } | Debug Tester | Protocol: IFJTAG", fillcolor="lightgrey"];
+inst_1 [label="{inst_1 | INTERFACE | \"SWJ_slave_interface\" | PowerDomain 0 \"Always On\" } | Interface", fillcolor="lightgrey"];
+inst_0 -> inst_1;
+inst_1 -> inst_3;
+inst_3 [label="{inst_3 | DEBUGPORT | \"\" | PowerDomain 0 \"Always On\" } | DPIDR: 0x3c013477 (Arm CoreSight SoC-600 DP r0p3) | JTAG IDCODE: 0x3ba06477 (Arm CoreSight SoC-600 JTAG-DP (4-bit IR) r0p3) | TargetID: 0x0fc10aab (ARMSTRONG rev0) | DPIDR1: 0x000000a0 (ERRMODE 1, 32 Address Bits) | Baseptr0: 0x00000001 | Baseptr1: 0x00000000", fillcolor="lightblue"];
+inst_3 -> inst_4;
+subgraph cluster_inst_4 {label = "Hierarcy: inst_4 - \"\"";
+inst_4 [label="{inst_4 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | FB-T0 AVOGADRO_FCV_S Class 0x9 ROM Table (null) rev0 | @ 0x0000000000000000 | CID 0xb105900d | PID 0x0a000d5832 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700af7 (Arm CoreSight ROM v0) | CoreSight ROM Table|{ 0 | 0x00020003 | <0> \-\> inst_5}|{ 1 | 0x00040003 | <1> \-\> inst_6}|{ 2 | 0x00060002 | not present }|{ 3 | 0x00080003 | <3> \-\> inst_7}", fillcolor="lightyellow"];
+inst_4:0 -> inst_5;
+inst_5 [label="{inst_5 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 APB4 Access Port (null) r1p0 | @ 0x0000000000020000 | CID 0xb105900d | PID 0x04002bb9e2 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700a17 (Arm Memory Access Port v2 v0) | Access Port AP IDR: 0x24770006 (Arm CoreSight SoC-600 APB4 Access Port r1p0) | Baseptr0: 0x00000003 | Baseptr1: 0x00000000", fillcolor="lightblue"];
+inst_5 -> inst_8;
+subgraph cluster_inst_8 {label = "Hierarcy: inst_8 - \"\"";
+inst_8 [label="{inst_8 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | FB-T0 AVOGADRO_TURING Class 0x9 ROM Table (null) rev0 | @ 0x0000000000000000 | CID 0xb105900d | PID 0x0a000d5833 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700af7 (Arm CoreSight ROM v0) | CoreSight ROM Table|{ 0 | 0x00001003 | <0> \-\> inst_9}|{ 1 | 0x00002003 | <1> \-\> inst_10}|{ 2 | 0x0001f003 | <2> \-\> inst_11}", fillcolor="lightyellow"];
+inst_8:0 -> inst_9;
+inst_9 [label="{inst_9 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x0000000000001000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+inst_8:1 -> inst_10;
+inst_10 [label="{inst_10 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm ELA-600 Embedded Logic Analyser (null) r1p0 | @ 0x0000000000002000 | CID 0xb105900d | PID 0x04001bb9d0 | DevType: 0x75 (CoreSight Debug Component: Debug Logic Generic, derived from signals) | DevArch: 0x47710a75 (Arm Embedded Logic Analyzer v1) | Trace Architecture: ELA v0.1", fillcolor="lightgrey"];
+inst_8:2 -> inst_11;
+inst_11 [label="{inst_11 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x000000000001f000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+}
+inst_4:1 -> inst_6;
+inst_6 [label="{inst_6 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 OPB4 Access Port (null) r1p0 | @ 0x0000000000040000 | CID 0xb105900d | PID 0x04002bb9e2 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700a17 (Arm Memory Access Port v2 v0) | Access Port AP IDR: 0x24770006 (Arm CoreSight SoC-600 APB4 Access Port r1p0) | Baseptr0: 0x00000003 | Baseptr1: 0x00000000", fillcolor="lightblue"];
+inst_6 -> inst_12;
+subgraph cluster_inst_12 {label = "Hierarcy: inst_12 - \"\"";
+inst_12 [label="{inst_12 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | FB-T0 AVOGADRO_TOP Class 0x9 ROM Table (null) rev0 | @ 0x0000000000000000 | CID 0xb105900d | PID 0x0a000d5830 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700af7 (Arm CoreSight ROM v0) | CoreSight ROM Table|{ 0 | 0x00001003 | <0> \-\> inst_13}|{ 1 | 0x00002003 | <1> \-\> inst_14}|{ 2 | 0x00003003 | <2> \-\> inst_15}|{ 3 | 0x00004003 | <3> \-\> inst_16}|{ 4 | 0x00005003 | <4> \-\> inst_17}|{ 5 | 0x0000f003 | <5> \-\> inst_18}", fillcolor="lightyellow"];
+inst_12:0 -> inst_13;
+inst_13 [label="{inst_13 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x0000000000001000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+inst_12:1 -> inst_14;
+inst_14 [label="{inst_14 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm ELA-600 Embedded Logic Analyser (null) r1p0 | @ 0x0000000000002000 | CID 0xb105900d | PID 0x04001bb9d0 | DevType: 0x75 (CoreSight Debug Component: Debug Logic Generic, derived from signals) | DevArch: 0x47710a75 (Arm Embedded Logic Analyzer v1) | Trace Architecture: ELA v0.1", fillcolor="lightgrey"];
+inst_12:2 -> inst_15;
+inst_15 [label="{inst_15 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x0000000000003000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+inst_12:3 -> inst_16;
+inst_16 [label="{inst_16 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x0000000000004000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+inst_12:4 -> inst_17;
+inst_17 [label="{inst_17 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x0000000000005000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+inst_12:5 -> inst_18;
+inst_18 [label="{inst_18 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x000000000000f000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+}
+inst_4:3 -> inst_7;
+inst_7 [label="{inst_7 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 APB4 Access Port (null) r1p0 | @ 0x0000000000080000 | CID 0xb105900d | PID 0x04002bb9e2 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700a17 (Arm Memory Access Port v2 v0) | Access Port AP IDR: 0x24770006 (Arm CoreSight SoC-600 APB4 Access Port r1p0) | Baseptr0: 0x00000003 | Baseptr1: 0x00000000", fillcolor="lightblue"];
+inst_7 -> inst_19;
+subgraph cluster_inst_19 {label = "Hierarcy: inst_19 - \"\"";
+inst_19 [label="{inst_19 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | FB-T0 AVOGADRO_SOCDBG Class 0x9 ROM Table (null) rev0 | @ 0x0000000000000000 | CID 0xb105900d | PID 0x0a000d5831 | DevType: 0x00 (CoreSight Debug Component: Miscellaneous Other) | DevArch: 0x47700af7 (Arm CoreSight ROM v0) | CoreSight ROM Table|{ 0 | 0x00001003 | <0> \-\> inst_20}|{ 1 | 0x00002003 | <1> \-\> inst_21}|{ 2 | 0x00003003 | <2> \-\> inst_22}|{ 3 | 0x00004003 | <3> \-\> inst_23}|{ 4 | 0x00005003 | <4> \-\> inst_24}|{ 5 | 0x00006003 | <5> \-\> inst_25}", fillcolor="lightyellow"];
+inst_19:0 -> inst_20;
+inst_20 [label="{inst_20 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Timestamp Generator (null) r0p0 | @ 0x0000000000001000 | CID 0xb105f00d | PID 0x04000bb193", fillcolor="lightgrey"];
+inst_19:1 -> inst_21;
+inst_21 [label="{inst_21 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Trace Memory Controller ETF (null) r0p4 | @ 0x0000000000002000 | CID 0xb105900d | PID 0x04004bb9ea | DevType: 0x32 (CoreSight Debug Component: Trace Link FIFO, Large Buffer) | DevArch: 0x00000000 ( (DevArch not present) )|FIFO depth: 4096 words", fillcolor="lightgrey"];
+inst_19:2 -> inst_22;
+inst_22 [label="{inst_22 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Trace Memory Controller ETR/ETS (null) r0p4 | @ 0x0000000000003000 | CID 0xb105900d | PID 0x04004bb9e8 | DevType: 0x21 (CoreSight Debug Component: Trace Sink Buffer or router) | DevArch: 0x00000000 ( (DevArch not present) )|Buffer depth: 0 words", fillcolor="lightgrey"];
+inst_19:3 -> inst_23;
+inst_23 [label="{inst_23 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Traceport Interface Unit (null) r1p0 | @ 0x0000000000004000 | CID 0xb105900d | PID 0x04001bb9e7 | DevType: 0x11 (CoreSight Debug Component: Trace Sink Trace port) | DevArch: 0x00000000 ( (DevArch not present) )|Maximum port size: 16 bits", fillcolor="lightgrey"];
+inst_19:4 -> inst_24;
+inst_24 [label="{inst_24 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight SoC-600 Cross Trigger Interface (null) r0p2 | @ 0x0000000000005000 | CID 0xb105900d | PID 0x04002bb9ed | DevType: 0x14 (CoreSight Debug Component: Debug Control Trigger Matrix) | DevArch: 0x47701a14 (Arm Cross Trigger Interface CTIv2.0)", fillcolor="lightgrey"];
+inst_19:5 -> inst_25;
+inst_25 [label="{inst_25 | PROGRAMMABLE | \"\" | PowerDomain 1 \"DP DBG\" } | Arm CoreSight STM-500 (null) r0p1 | @ 0x0000000000006000 | CID 0xb105900d | PID 0x04001bb963 | DevType: 0x63 (CoreSight Debug Component: Trace Source Associated with software) | DevArch: 0x47710a63 (Arm System Trace Macrocell STMv1.1) | Trace Architecture: STM v1.1", fillcolor="lightgrey"];
+}
+}
+}

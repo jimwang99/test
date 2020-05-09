@@ -1,0 +1,2 @@
+default:
+	jupyter graphviz.ipynb

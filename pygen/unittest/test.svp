@@ -1,0 +1,19 @@
+
+// module test for testing pygen
+
+/*<<
+import pygen as pg
+>>*/
+
+module test();
+
+/*<<
+s = ''
+
+for ii in range(4):
+    s += 'wire  signal_{}\n'.format(ii)
+
+pg.gen(s)
+>>*/
+
+endmodule

@@ -1,0 +1,7 @@
+module test (
+    {% for ii in range(n_e3|int) -%}
+    input       psel_{{ii}},
+    {% endfor %}
+);
+
+endmodule
