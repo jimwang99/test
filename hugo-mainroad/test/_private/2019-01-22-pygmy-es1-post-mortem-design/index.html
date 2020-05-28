@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Pygmy ES1 Post-mortem: Design - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="Pygmy ES1 Post-mortem: Design" />
+<meta property="og:description" content="CPU I-Cache The current problem with I-Cache and the IF/ID stages are that they are designed to be highly coupled, but actually I put I-Cache module outside of IF, making the whole flow-control signals very weird.
+To improve current design:
+ First of all, put the I-Cache back into IF, and make the generation of control flow signals more natual Then decouple IF from ID/EX/MA/WB stage, as front-end and back-end. This front-end don&rsquo;t need to prefetch too much, just output to a 2-entry FIFO would be enough for this 5-stage in-order issue pipeline." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/_private/2019-01-22-pygmy-es1-post-mortem-design/" />
+<meta property="article:published_time" content="2019-01-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-01-22T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Pygmy ES1 Post-mortem: Design</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2019-01-22T00:00:00Z">January 22, 2019</time></div></div>
+		</header><div class="content post__content clearfix">
+			<h1 id="cpu">CPU</h1>
+<h2 id="i-cache">I-Cache</h2>
+<p>The current problem with I-Cache and the IF/ID stages are that they are designed to be highly coupled, but actually I put I-Cache module outside of IF, making the whole flow-control signals very weird.</p>
+<p>To improve current design:</p>
+<ul>
+<li>First of all, put the I-Cache back into IF, and make the generation of control flow signals more natual</li>
+<li>Then decouple IF from ID/EX/MA/WB stage, as front-end and back-end. This front-end don&rsquo;t need to prefetch too much, just output to a 2-entry FIFO would be enough for this 5-stage in-order issue pipeline.</li>
+</ul>
+<blockquote>
+<p>Module definition and separation have to consider if flow control is intuitive or not</p>
+</blockquote>
+<h2 id="if-stage">IF stage</h2>
+<p>Current IF stage contains lots of decoding logic that handles instructions like unconditional jump, fence, WFI and etc. This gives a little bit performance/power gain, but introduced some delay into the I-Cache tag RAM critical path. It&rsquo;s OK in 28nm process to reach 600MHz frequency with relatively small I-Cache size.</p>
+<p>Later on, after adding RVC support, there are even more logic to determine the states of RVC instruction handling and fetching. The extra logic involving I-Cache is even longer and slower. In SMIC 110nm process, it&rsquo;s very hard to reach 200MHz frequency, so we have to modify the I-Cache to a 2-stage pipeline design. (Fairly speaking, ARM-9&rsquo;s design is the same for a slow process like 110nm.)</p>
+<p>My design intention of this IF stage is to fetch one instruction and one struction only every cycle. And this is <strong>UNNECESSARY</strong>. The right intention should be</p>
+<ul>
+<li>Fetch the data that the correct PC, or at least the PC that you think it&rsquo;s correct, is pointing at.</li>
+<li>Continue to move on with the PC if there is no sign of branch.</li>
+<li>Let the decode stage to decide what kind of instruction or instructions they are.</li>
+<li>Kill the ones that are incorrectly fetched, because of branch.</li>
+</ul>
+<p>So to improve current design, we should do</p>
+<ul>
+<li>Adapt this decoupled design perspective.</li>
+<li>Move all the decoding related stuff into decode.</li>
+</ul>
+<blockquote>
+<p>Decouple front-end (fetch) and back-end (decode and execution) is the right way to reduce design complexity and improve performance</p>
+</blockquote>
+<h2 id="id-stage">ID Stage</h2>
+<p>The ID stage is relative simple in current design.</p>
+<p>Most of the decoding code is generated by a Python script taking inputs from an Excel sheet. That Excel sheet defines all the instructions, within the ISA definition or customized, as well as their expected control signals.</p>
+<p>Improvements that could be done</p>
+<ul>
+<li>Make the decoding parts also generated</li>
+</ul>
+<blockquote>
+<p>This is a very good practice that I&rsquo;m really happy with. It makes adding new instructions very easy and clear.</p>
+</blockquote>
+<p>Except for instruction decoding, there are code handle scoreboard and data forwarding, as well as some simple scheduler for ALU, integer multiplier, integer divider, floating point unit.</p>
+<p>Future improvements could be done</p>
+<ul>
+<li>Move the RVC decoding, unconditional jump resolver, WFI/WFE handling to this stage</li>
+<li>To make a dual-issue design, probably will need to split current design into two separate decode and issuer stages for better timing</li>
+</ul>
+<h2 id="d-cache">D-Cache</h2>
+<p>In ES1, D-Cache is only a 2-entry store buffer consist of tag, data, valid bits for each byte, and dirty bits for each byte. Each entry is 256-bit, a cache line size. Its purpose is to consolidate write operations instead of always issue write requests to the L2 cache, even when it&rsquo;s only <code>LB</code> after <code>LB</code>. It also need to take <code>fence</code> instruction to explicitly write dirty data back to L2.</p>
+<p>In later on Anyka project, it was changed to a full functional write-back D-Cache w/o store buffer</p>
+<h2 id="csr">CSR</h2>
+<p>TODO</p>
+<h1 id="vcore">VCore</h1>
+<h2 id="pipeline">Pipeline</h2>
+<p>The VCore pipeline is directly hooked up after IF stage of the 5-stage ORV CPU. It uses the IF stage as its front-end, and totally decoupled all the stages after that. So</p>
+<ul>
+<li>When the instruction is a scalar instruction (non-vector instruction), it goes down into ID/EX/&hellip; inside the ORV CPU.</li>
+<li>When the instruction is a vector instruction, it immediately goes down into VCore.</li>
+<li>Decoupled decoding stage makes it easier for 2 engineers separate their work.</li>
+</ul>
+<p>The original design intention of mixing vector core along with scalar core is to be able to mix the vector instructions with scalar instructions together in C++ code, so that the programming model is smooth for software engineer to use. But the vector pipeline cannot access the scalar register file, then it has to communicate with the scalar instructions through CSR read/write. This makes the programming model not intuitive, and having more overhead.</p>
+<p>To improve current design, what we should do</p>
+<ul>
+<li>Mix the vector ALU into the pipeline, after the issuer. Then it will have access to scalar register file as well.</li>
+<li>Change the original EX then MA (memory access) pipeline into parallel design. That&rsquo;s ALU, IMD(integer MULDIV), FPU(floating point unit), LSU (load store unit), VALU, VDOT, and etc. in parallel after issuer.</li>
+<li>Add scoreboard for the vector register file also to keep tracking data dependency between vector instructions.</li>
+</ul>
+<h2 id="instructions">Instructions</h2>
+<p>There is vector extension coming out soon, and SiFive is going to support it with its newly developed SoC. OURS should catch up by supporting this vector extension, if not 100% in the very beginning.</p>
+<p>An example from RISC-V Vector ISA tutorial on 2018 workshop.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">// This is the C++ code that needs vectorization
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">float</span> a;
+<span style="color:#66d9ef">float</span> vec[<span style="color:#ae81ff">1714</span>];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>; i<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">1714</span>; i<span style="color:#f92672">++</span>) {
+    vec[i] <span style="color:#f92672">=</span> vec[i] <span style="color:#f92672">+</span> a;
+}
+</code></pre></div><p>If use RISC-V Vector Extension, it will look like this:</p>
+<pre><code class="language-assembly" data-lang="assembly"># assume x1 = 1714, the total # of operations need to be done
+# assume x3 = address of vec, x4 = address of a
+vconfig		0x63  				# enable vector unit
+												# and config it to use 4 vector registers, 32b data
+vfld.s		v1.s, 0(x4) 	# load 'a' constant and broadcast into v1
+
+_loop:
+vsetvl		x2, x1				# set both vl and x2 to min(maxvl, x1)
+												# it's the # of operations we finish in this single loop
+#====== major vector part begin ======
+vflw			v0, 0(x3)			# load 'vl' elements out of 'vec'
+vfadd.s		v2, v1, v0		# floating-point adder
+vsw				v2, 0(x3)			# store result back to 'vec'
+#====== major vector part end ======
+slli			x5, x2, 2			# calculate bytes consumed from 'vec' = x2 * sizeof (float)
+add 			x3, x3, x5		# increment vec pointer for next loop
+sub				x1, x1, x2		# calculate remaining # of operations
+bne				x1, x0, _loop	# next loop
+
+vconfig		0x0						# disable vector unit after all the work is done
+</code></pre><h2 id="chaining">Chaining</h2>
+<p>With this new vector extension and the LLVM support, chaining is kind of a nature thing, even between load-store instructions and ALU instructions, if micro-architecture is designed properly.</p>
+<p>From last section&rsquo;s example, we know that the majority vector operations are just 3 instructions, <code>vflw</code>/<code>vfadd.s</code>/<code>vsw</code>. It summarized a typical vector operation: load, operate, then store, while operate may contain couple of vector instructions but not very long. So it&rsquo;s very important to chain load + operate, operate-A + operate-B, operate + store, to make sure no cycles are wasted waiting for the whole vector to be completely done with last instruction.</p>
+<h1 id="soc">SoC</h1>
+<p>TODO</p>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/_private/2019-01-18-anyka-post-mortem-self-version/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title">Anyka project post-mortem (my own summary)</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

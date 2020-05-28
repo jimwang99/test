@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>ARM Training: Cortex Processor Behaviors - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="ARM Training: Cortex Processor Behaviors" />
+<meta property="og:description" content="Simple Sequential Execution Model After optimization, the result should be exactly the same with &ldquo;simple sequential execution model&rdquo;.
+Optimization: Instruction Fetching  Fetch multiple instructions from memory Branch  Predictive fetch and execution Branch caches Return stack  The &ldquo;link register&rdquo; value is pushed into the stack, and used/popped when return E.g. 4 entries of return stack, but my call stack is 5, then miss will happend. Then what to do?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/blog/note/2019-03-18-cortex-processor-behaviors/" />
+<meta property="article:published_time" content="2019-03-18T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-03-18T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">ARM Training: Cortex Processor Behaviors</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2019-03-18T00:00:00Z">March 18, 2019</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg><span class="meta__text"><a class="meta__link" href="/categories/note/" rel="category">note</a>
+	</span>
+</div></div>
+		</header><div class="content post__content clearfix">
+			<h2 id="simple-sequential-execution-model">Simple Sequential Execution Model</h2>
+<p>After optimization, the result should be exactly the same with &ldquo;simple sequential execution model&rdquo;.</p>
+<h2 id="optimization-instruction-fetching">Optimization: Instruction Fetching</h2>
+<ul>
+<li>Fetch multiple instructions from memory</li>
+<li>Branch
+<ul>
+<li>Predictive fetch and execution</li>
+<li>Branch caches</li>
+<li>Return stack
+<ul>
+<li>The &ldquo;link register&rdquo; value is pushed into the stack, and used/popped when return</li>
+<li>E.g. 4 entries of return stack, but my call stack is 5, then miss will happend. Then what to do? Discard all of the content probably will be the most obvious answer.</li>
+</ul>
+</li>
+<li>Conditional branch prediction
+<ul>
+<li>Shift register of branch execution history, taken is 1&rsquo;b1 and non-taken is 1&rsquo;b0</li>
+<li>Use the pattern to predict the next branch</li>
+<li>Use branch monitor&rsquo;s result to update this prediction table</li>
+</ul>
+</li>
+<li>Misprediction
+<ul>
+<li>Predict into non-executable memory region, MMU needs to react</li>
+<li>Some architecures require control bits to disable prediction</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="feedback-branch-prediction.png" alt="Feedback branch prediction"></p>
+<p><img src="prediction-table.png" alt="Prediction table"></p>
+<h2 id="optimization-data-processing">Optimization: Data Processing</h2>
+<ul>
+<li>Multiple execution pipelines
+<ul>
+<li>Multi-decode, multi-issue if no dependency
+<ul>
+<li>Data/structure dependency</li>
+</ul>
+</li>
+<li>Out-of-order issue/execution</li>
+</ul>
+</li>
+<li>Speculative execution of memory access
+<ul>
+<li>Do memory load before the insturction is even issued</li>
+</ul>
+</li>
+<li>Register renaming
+<ul>
+<li>To solve local register dependencies</li>
+</ul>
+</li>
+<li>Interrupt
+<ul>
+<li>Cortex-A: imprecise interrupt
+<ul>
+<li>Outstanding instructions have to finish before handling interrupt</li>
+</ul>
+</li>
+<li>Cortex-R:
+<ul>
+<li>Cancel current outstanding instructions to handling interrupt more quickly</li>
+<li>Load/store to device memory won&rsquo;t be cancelled. So the access time to device memory has to be limited, because it gates the whole system&rsquo;s response time</li>
+</ul>
+</li>
+<li>Cortex-M
+<ul>
+<li>Abandon all outstanding instructures</li>
+<li>Pause-continue: pause all the access to the memories, even to device memory, then continue later. Some may not be able to resume, so to protect them, use <code>volatile</code> keyword for those memory locations.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="optimization-memory-access">Optimization: Memory Access</h2>
+<p><img src="block-diagram-memory-access.png" alt="Block diagram of memory access"></p>
+<ul>
+<li>Cache
+<ul>
+<li>Replacement strategies: random (most common), round robin, LRU (least recently used)</li>
+<li>ARM has PLI/PLD instructions to load memory into cache</li>
+<li>Prefetch: need to check MMU attributes</li>
+<li>Cache coherent
+<ul>
+<li>Clean / invalidate</li>
+<li>Point of unification: the place in the same system where one data location is synced</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Merging
+<ul>
+<li>Transactions to the same cache line will be merged in the buffers
+<ul>
+<li>For both memory or device access, but not for non-gatherable locations</li>
+</ul>
+</li>
+<li>Reading will snoop into the buffer for updated value</li>
+</ul>
+</li>
+<li>Reordering
+<ul>
+<li>Except for non-gatherable, non-orderable, the same periphral, else memory accesses can be reordered for better performance.</li>
+<li>To gurantee memory access order
+<ul>
+<li>Data memory barrier (DMB) / atomic / data synchronization barrier (DSB) / instruction synchronization barrier (ISB)</li>
+<li><strong>Speculative load</strong> will not be affected by barriers</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<h3 id="cortex-a">Cortex-A</h3>
+<ul>
+<li>Low power
+<ul>
+<li>Shorter pipeline, in-order exe, limited speculation</li>
+</ul>
+</li>
+<li>High performance
+<ul>
+<li>Longer pipeline, out-of-order exe, all speculation</li>
+</ul>
+</li>
+</ul>
+<h3 id="cortex-r">Cortex-R</h3>
+<ul>
+<li>Hard real-time requirement
+<ul>
+<li>In-order</li>
+<li>Data prefetching</li>
+</ul>
+</li>
+<li>Avoid over-engineering</li>
+</ul>
+<h3 id="cortex-m">Cortex-M</h3>
+<p><img src="cortex-m-family.png" alt="Cortex-M family"></p>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/blog/arch/2019-03-11-interrupt-and-arm-gic/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title">Interrupts and ARM GIC Architecture</p>
+		</a>
+	</div>
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-50-uncore/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title">[RISC-V Architecture Training] Uncore</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

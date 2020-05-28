@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SNUG Silicon Valley 2017 at Santa Clara Conventional Center - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="SNUG Silicon Valley 2017 at Santa Clara Conventional Center" />
+<meta property="og:description" content="Day 1 Morning  Paper from microsoft   Microsoft has a IC design team? Apparently it does. Grey code: even when metastability happends, it falls to adjecent states, instead of unknow states, it&rsquo;s acceptable in some cases. Data bus bridge (DBB) for low data throughput Async FIFO: more area, more complexity  Panel: synthesis into the future   The disruption in advanced nodes (10nm/7nm)  Thermal: drives max freq; heating wires degreeds EM lifetime IoT: analog-digital co-design; physical/electical context-aware synthesis (the tool need to be aware of the block&rsquo;s specific attributes, such as thermal/IR to avoid analog/digital interference." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/blog/industry/2017-04-30-snug-2017/" />
+<meta property="article:published_time" content="2017-04-30T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-04-30T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">SNUG Silicon Valley 2017 at Santa Clara Conventional Center</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2017-04-30T00:00:00Z">April 30, 2017</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg><span class="meta__text"><a class="meta__link" href="/categories/industry/" rel="category">industry</a>
+	</span>
+</div></div>
+		</header><div class="content post__content clearfix">
+			<h1 id="day-1-morning">Day 1 Morning</h1>
+<ol>
+<li>Paper from microsoft</li>
+</ol>
+<ul>
+<li>Microsoft has a IC design team? Apparently it does.</li>
+<li>Grey code: even when metastability happends, it falls to adjecent states, instead of unknow states, it&rsquo;s acceptable in some cases.</li>
+<li>Data bus bridge (DBB) for low data throughput</li>
+<li>Async FIFO: more area, more complexity</li>
+</ul>
+<ol start="2">
+<li>Panel: synthesis into the future</li>
+</ol>
+<ul>
+<li>The disruption in advanced nodes (10nm/7nm)
+<ul>
+<li>Thermal: drives max freq; heating wires degreeds EM lifetime</li>
+<li>IoT: analog-digital co-design; physical/electical context-aware synthesis (the tool need to be aware of the block&rsquo;s specific attributes, such as thermal/IR to avoid analog/digital interference. Ex: PLL cause high IR drop so it cannot be placed near some sensitive digital blocks)</li>
+<li>Power: low power is usually focused, but power density is more important. Thermal dissipasion is the key to successful product.</li>
+</ul>
+</li>
+<li>Context includes 2 different aspect
+<ul>
+<li>Chip-level placement and interface</li>
+<li>Thermal dissipation</li>
+</ul>
+</li>
+<li>Accurate variation modeling is important for the digital</li>
+<li>Blind clock gating for big blocks is not very good for IR drop, because it will create large power/ground noise. Instead, use smaller cores to go continuously is a better choice other than using large powerful cores working on and off.</li>
+<li>My take-aways: future EDA will merge front-end and back-end. The flow will be unified, as well as the interface and engines. It will require engineers to know better for the whole flow. It fits my understanding of full stack engineer.</li>
+</ul>
+<h1 id="day-1-afternoon">Day 1 Afternoon</h1>
+<ol>
+<li>Paper from Broadcom about DSP ungrouping</li>
+</ol>
+<ul>
+<li>Not interesting as expected.</li>
+<li>Issue with auto ungrouping: design hierarchy change, or even port/logic change/moving
+<ul>
+<li>constraint need to change (it seems Broadcom use hand written constraint file for synthesis and timing analysis, instead of dump out SDC from Synthesis tool to use it in STA)</li>
+<li>script need to change</li>
+<li>porting script from one design to another is difficult</li>
+</ul>
+</li>
+<li>Potential target to choose for ungrouping?
+<ol>
+<li>no ungroup at all vs. auto ungroup</li>
+<li>analyze both timing reports to find out critical paths that improved after ungrouping</li>
+<li>only ungroup the paths that improved</li>
+</ol>
+</li>
+<li>One take-away: they dump out timing paths into text files and do post-processing using Python. Another one is from my question, they use unified constraint files for both synthesis and STA, instead of write out SDC from synthesis tool and use it in STA. That actually make sense because unified constraint files are more understandable.</li>
+</ul>
+<ol start="2">
+<li>Configurable design using SystemVerilog</li>
+</ol>
+<ul>
+<li>Virtual classes, parameters, interfaces and etc to make RTL design more configurable. The author did some research abour work-arounds and what is synthesizable with current DC and VCS.</li>
+<li>Afterwards, I had a very interesting talk with the author and some other audiences. One important thing the others mentioned is that even 99% of the tools support one feature, and if the other 1% is not will kill the whole schedule. And they were beaten up a lot by other designers or front-back-end engineers because they use advanced coding techiques from SystemVerilog in their RTL. Some guy from Qualcomm mentioned that he was forbidden to use even parameters in his block. So it seems that there are not strong willing to switch from Verilog to SystemVerilog, especially from management level because nobody want to take risks in exchange of some configurability. That actually leads to my question to them that if anybody sees any performance improvements by using SystemVerilog. The author mentioned that using &ldquo;for&rdquo; loops instead of multiple &ldquo;assign&rdquo; will help the compiler to understand design intent and somehow improved the performance in one case.</li>
+</ul>
+<h1 id="day-2-morning">Day 2 Morning</h1>
+<ol>
+<li>Nanotime used in NVIDIA (Robert)</li>
+</ol>
+<ul>
+<li>The presentation is from its memory team. The author mainly focused on the POCV features in Nanotime, and how to embedded ocv_sigma tables in liberty file from extract_model. And they did some correlation between POCV in Nanotime against Monte Carlo in HSPICE. The correlation is not very good at present time with the characterization script (to generate OCV parameter for each kind of transistors) provide by Synopsys. He also mentioned that they are going back to close the loop by feedback the correlation result into characterization script, hoping to improve the accruacy.</li>
+<li>Transistor variation coefficient (characterization script from Synopsys)
+<ul>
+<li><code>set_variation_parameters</code></li>
+<li>for every individual types of transistors (different parameters)</li>
+<li>transistor variation in stack series is <strong>different</strong>: more stack less variation</li>
+</ul>
+</li>
+<li>How to validate the path variation?
+<ul>
+<li>Use SPICE Monte Carlo simulation after write_spice from Nanotime.</li>
+</ul>
+</li>
+<li>How to choose candidate for DDS?
+<ul>
+<li>Critical paths</li>
+</ul>
+</li>
+<li>LVF tables (ocv_sigma) have delay/transition/setup/hold</li>
+</ul>
+<ol start="2">
+<li>Nanotime flow in Wave Computing (Roger Carpenter)</li>
+</ol>
+<ul>
+<li>Product
+<ul>
+<li>16K instances of DPU</li>
+<li>Entire core is custom design
+<ul>
+<li>Network-on-chip, PCIe, DDR, HMC (Hybrid Memory Cube)</li>
+</ul>
+</li>
+<li>Global async local sync design</li>
+</ul>
+</li>
+<li>Runtime issue? No.</li>
+<li>Coverage report to define the completion of constraint coverage</li>
+<li>Nanotime vs. write_spice
+<ul>
+<li>TT 25c no SI: delta &lt; 8%</li>
+</ul>
+</li>
+<li>This is very interesting for myself personally because they are using custom digital design approach to implement deep learning accelerators which can achieve 10GHZ (actually what I heard is 6.7GHz in 16nm). They used schematic and hand placment, used pulse latch + domino logic + global async local sync clocking scheme. They used to use spice to close timing on their DSP core (which has 16k instances overall) in 28nm but finally moved into Nanotime. It is a very interesting company. And amazing to hear that anybody is still using this &ldquo;lost art&rdquo; in real chip design.</li>
+<li>Afterwards, we have several people gathering around to talk about this. A guy from Intel also mentioned that Intel themselves have moved away from custom design.</li>
+</ul>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/blog/tool/2018-11-01-wsl-tips/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title">WSL (Windows Subsystem Linux) Tips</p>
+		</a>
+	</div>
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/blog/note/2017-05-05-genus-training/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title">GENUS Training Notes</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title> - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="" />
+<meta property="og:description" content="Tensilica Processor Fundamentals v7.4 Xtensa architecture training  Custom instructions and registers Parallelized instructions Specialized interfaces  Ports and queues    Processor architecture basics   RISC architecture &#43; harvard architecture
+ Load/store    5 or 7 stage pipeline (configurable)
+  Single or multi issue, in-order execution
+  Big or little endian (configurable)
+  24-bit instruction &#43; 16-bit format (save code space)
+ Optional VLIW instruction, 8 bytes or 16 bytes No mode switching required Base inst # = 80 &ldquo;." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/_draft/2019-06-06-cadence-tensilica-training/" />
+
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title"></h1>
+			
+		</header><div class="content post__content clearfix">
+			<h2 id="tensilica-processor-fundamentals-v74">Tensilica Processor Fundamentals v7.4</h2>
+<h3 id="xtensa-architecture-training">Xtensa architecture training</h3>
+<ul>
+<li>Custom instructions and registers</li>
+<li>Parallelized instructions</li>
+<li>Specialized interfaces
+<ul>
+<li>Ports and queues</li>
+</ul>
+</li>
+</ul>
+<h3 id="processor-architecture-basics">Processor architecture basics</h3>
+<ul>
+<li>
+<p>RISC architecture + harvard architecture</p>
+<ul>
+<li>Load/store</li>
+</ul>
+</li>
+<li>
+<p>5 or 7 stage pipeline (configurable)</p>
+</li>
+<li>
+<p>Single or multi issue, in-order execution</p>
+</li>
+<li>
+<p>Big or little endian (configurable)</p>
+</li>
+<li>
+<p>24-bit instruction + 16-bit format (save code space)</p>
+<ul>
+<li>Optional VLIW instruction, 8 bytes or 16 bytes</li>
+<li>No mode switching required</li>
+<li>Base inst # = 80</li>
+<li>&ldquo;.N&rdquo; suffix for density instructions</li>
+</ul>
+</li>
+<li>
+<p>GPR # = 16 x 32-bit</p>
+<ul>
+<li>a0 &hellip; a15</li>
+<li>Physical registers # can be configured as 16/32/64
+<ul>
+<li>Windowed register, shows only 16 of them</li>
+</ul>
+</li>
+<li>2r1w, but will potentially get more if use some extended instructions</li>
+</ul>
+</li>
+<li>
+<p>Pipeline</p>
+<ul>
+<li>5-stage: instruction fetch + decode &amp; register read + execute + memory access (load) + writeback (register or mem store)</li>
+</ul>
+<p><img src="./image-20190606143924718.png" alt="image-20190606143924718"></p>
+<ul>
+<li>Cadence has a profiler that shows pipeline stages&rsquo; condition in graphics</li>
+<li>Replay pipeline
+<ul>
+<li>When a cache-miss happends, instead of waiting in MA stage, instruction is killed then restart from IF stage (will appear twice in the trace log) and then wait in the R stage.
+<ul>
+<li>Maybe because of multi-issue happening in R stage, so that later load/store instructions will not be stalled because of structure hazard caused by cache miss</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>7-stage: IF x2 + MA x2, more cycles for memory access
+<ul>
+<li>Branch panelty is 1 cycle larger</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Memory subsystem</p>
+<ul>
+<li>Local memory (tightly coupled): IRAM &amp; DRAM</li>
+<li>Caches: I-Cache &amp; D-Cache
+<ul>
+<li>Write-through or write-back (configurable in hardware)
+<ul>
+<li>If write-back, software defines no-allocation or with allocation</li>
+<li>Even software can change write-back/write-through behavior</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>System memory: PIF (processor interface) protocol + bridges</li>
+<li>Memory region attribute
+<ul>
+<li>cacheable ? Readable ? Writeable ?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="image-20190606150550092.png" alt="image-20190606150550091"></p>
+<ul>
+<li>Architecture summary</li>
+</ul>
+<p><img src="image-20190606151016489.png" alt="image-20190606151016489"></p>
+<h3 id="xtensa-specific-instruction-architecture-features">Xtensa-specific instruction architecture features</h3>
+<ul>
+<li>Configurable optional instructions
+<ul>
+<li>Arithmetic instructions
+<ul>
+<li>Mul, MAC, DIV, floating point (single or double precision)</li>
+</ul>
+</li>
+<li>Synchronization instructions for ordering: all previous data side memory accesses have to finish before the next data side memory or cache access is issued
+<ul>
+<li>Acquire/release</li>
+<li>Conditional store</li>
+<li>Also provide AXI-4 bridge options</li>
+</ul>
+</li>
+<li>Zero overhead loop
+<ul>
+<li>Remove loop overhead: combine loop index increment and comparison into implicit operations (only once defined instruction before the loop body)</li>
+<li>Support by C/C++ compiler</li>
+<li>No loop nesting supported</li>
+</ul>
+</li>
+<li>Predefined DSP co-processor extensions</li>
+</ul>
+</li>
+<li>Optional specialized registers
+<ul>
+<li>1-bit boolean registers</li>
+<li>32-bit floating point registers</li>
+<li>MAC data registers</li>
+<li>DSP registers come along with DSP co-processor extensions</li>
+<li>All above are supported by the compiler</li>
+</ul>
+</li>
+<li>N-issue FLIX (flexible length instruction extensions) parallel pipelines
+<ul>
+<li>Parallel pipelines, also parallel to base pipeline</li>
+<li>4 bytes to 16 bytes VLIW</li>
+</ul>
+</li>
+</ul>
+<h3 id="generate-a-new-xtensa-core">Generate a new Xtensa core</h3>
+<ul>
+<li>Xtensa Xplorer
+<ul>
+<li>PPA estimation</li>
+</ul>
+</li>
+<li>XPG (Xtensa Processor Generator): a web based server
+<ul>
+<li>RTL + EDA script + tests</li>
+<li>C/C++ compiler + debugger + ISA simulator + RTOS</li>
+</ul>
+</li>
+</ul>
+<h3 id="ar-register-file-and-abi-application-binary-interface">AR register file and ABI (application binary interface)</h3>
+<ul>
+<li>Pass parameters and results when function call
+<ul>
+<li>Stack memory or register file
+<ul>
+<li>Xtensa&rsquo;s solution: windows AR register file
+<ul>
+<li>Advantage: function all performance (10%), reduced code size (5~10%), reduced power by not use stack memory</li>
+<li>Special CALL: <code>call8</code> = shift window up by 8
+<ul>
+<li>Nested calls will continue to shift window up by 8</li>
+<li>Overflow
+<ul>
+<li>Trigger exception when wrap around (move up will wrap around)
+<ul>
+<li>Move overflow registers to stack memory</li>
+</ul>
+</li>
+<li>32 AR registers, 3 nested calls cause overflow</li>
+<li>64 AR registers, 7 nested calls cause overflow</li>
+<li>Because there would be exception calls, performance is impacted. Avoid deep function calls in performance critical code</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Disassembler will only show a0 - a15 instead of real AR register</li>
+<li><code>call0</code> only use 16 physical AR registers</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="xtensa-specific-local-memory-architecture">Xtensa specific local memory architecture</h3>
+<ul>
+<li>I-RAM, I-ROM, D-RAM, D-ROM
+<ul>
+<li>Everything else if PIF</li>
+<li>Tightly coupled local memory: same clock cycle, single cycle access</li>
+<li>I-Cache and D-Cache are also on the local memory buses (instruction bus and data bus)</li>
+<li>Loads are speculative, stores are non-speculative
+<ul>
+<li>Speculative loads will stay before WB stage until it&rsquo;s OK to commit</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="image-20190607114614710.png" alt="image-20190607114614710"></p>
+<ul>
+<li>
+<p>Local memory interface is fully exposed to user through an interface</p>
+</li>
+<li>
+<p>Ordering</p>
+<ul>
+<li>Late loads can bypass early stores
+<ul>
+<li>If dependency between them???</li>
+</ul>
+</li>
+<li><code>MEMW</code> to enforce program order</li>
+</ul>
+</li>
+<li>
+<p>Store buffer</p>
+<ul>
+<li>2 or 3 entries of FIFO
+<ul>
+<li>No reordering</li>
+</ul>
+</li>
+<li>Store to the same address are not merged ! (what???)
+<ul>
+<li>But with &ldquo;dual load/store&rdquo; option, stores to the same address will get combined</li>
+</ul>
+</li>
+<li>Stores will wait for PIF to be free, then write-back</li>
+<li>in C/C++, declare pointers or arrays as <code>volatile</code> will insert <code>MEMW</code> on every volatile access
+<ul>
+<li><code>MEMW</code> enforce store buffer flush before load</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Parallel memory accesses with dual load/store</p>
+<ul>
+<li>Need FLIX instruction to fully utilize dual load/store</li>
+<li>Connection-box</li>
+</ul>
+</li>
+<li>
+<p>Banking to improve power and performance</p>
+<ul>
+<li>Transparent</li>
+</ul>
+</li>
+<li>
+<p>ECC/parity</p>
+</li>
+<li>
+<p>Sharing local memory</p>
+</li>
+</ul>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/_draft/2020-02-02-design-patterns/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title"></p>
+		</a>
+	</div>
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/_draft/2018-10-22-face-recognition-using-opencv/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title">Face Recognition Using OpenCV</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title> - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="" />
+<meta property="og:description" content="Working with Device Tree (DOULOS) Intro   Device tree: for non-discoverable hardware, included in BSP
+  Source type
+ Old style: C code BSP, files compiled into the kernel New style: device-tree BSP -&gt; device tree blob (load by boot loader)    Compilation In-tree vs. out-of-tree
+dtc command
+ convert .dts to .dtb, and backwards  Device tree syntax   devicetree.org
+  Nodes
+  Properties" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/_draft/2020-03-06-working-with-device-tree-doulos/" />
+
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title"></h1>
+			
+		</header><div class="content post__content clearfix">
+			<h1 id="working-with-device-tree-doulos">Working with Device Tree (DOULOS)</h1>
+<h2 id="intro">Intro</h2>
+<ul>
+<li>
+<p>Device tree: for non-discoverable hardware, included in BSP</p>
+</li>
+<li>
+<p>Source type</p>
+<ul>
+<li>Old style: C code BSP, files compiled into the kernel</li>
+<li>New style: device-tree BSP -&gt; device tree blob (load by boot loader)</li>
+</ul>
+</li>
+</ul>
+<h2 id="compilation">Compilation</h2>
+<p>In-tree vs. out-of-tree</p>
+<p><code>dtc</code> command</p>
+<ul>
+<li>convert .dts to .dtb, and backwards</li>
+</ul>
+<h2 id="device-tree-syntax">Device tree syntax</h2>
+<ul>
+<li>
+<p>devicetree.org</p>
+</li>
+<li>
+<p>Nodes</p>
+</li>
+<li>
+<p>Properties</p>
+<ul>
+<li>Values</li>
+</ul>
+</li>
+<li>
+<p>Root node = <code>/</code></p>
+</li>
+<li>
+<p>Values format</p>
+<ul>
+<li>int, string, list of string, phandle (reference to other node)</li>
+</ul>
+</li>
+<li>
+<p>Standard properties</p>
+<ul>
+<li><code>compatible</code></li>
+<li><code>model = &quot;vendor,board&quot;</code></li>
+<li><code>status = &quot;okay&quot;</code></li>
+<li>For <code>root</code> node, memory map address must be specified
+<ul>
+<li><code>#address-cells = &lt;1&gt;</code>
+<ul>
+<li>define the address length</li>
+<li>1 = 32-bit, 2 = 64-bit</li>
+</ul>
+</li>
+<li><code>#size-cells = &lt;1&gt;</code>
+<ul>
+<li>define the size length</li>
+<li>1 = 32-bit, 2 = 64-bit</li>
+</ul>
+</li>
+<li><code>reg = &lt;${base},${size} </code>
+<ul>
+<li>address map</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Mapping between device and CPU</li>
+</ul>
+</li>
+<li>
+<p>Must have <code>cpus</code> and <code>memory@0</code> as nodes as well</p>
+</li>
+<li>
+<p>Special node</p>
+<ul>
+<li><code>chosen</code></li>
+<li><code>aliases</code>
+<ul>
+<li>Alias to a full path of a device</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Interrupts</p>
+<ul>
+<li>
+<p><code>interrupt-controller</code> empty property</p>
+</li>
+<li>
+<p><code>#interrupt-cells</code>: # of intps</p>
+</li>
+<li>
+<p>Devices connect to the interrupt controller</p>
+<ul>
+<li><code>interrupt-parent</code></li>
+<li><code>interrupts</code></li>
+<li><code>interrupt-names</code> (optional)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="parsing-the-device-tree">Parsing the device tree</h2>
+<ul>
+<li><code>device_driver</code> defines <code>compatible</code></li>
+<li><strong>Unified device proerty interface</strong></li>
+</ul>
+<h2 id="device-tree-overlays">Device tree overlays</h2>
+<h2 id="other-description-language">Other description language</h2>
+<ul>
+<li>Kernel v5.0 support YAML as well</li>
+<li></li>
+</ul>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/_draft/2020-02-02-design-patterns/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title"></p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Huwcha Accelerator architecture - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="Huwcha Accelerator architecture" />
+<meta property="og:description" content="From the reading of this paper, &ldquo;The Hwacha Microarchitecture Manual, Version 3.8.1&rdquo;, I found out that our Pygmy ES1 architecture is almost the same idea, just not as fancy.
+ We don&rsquo;t have cache coherency, because we operate on unified physical memory space The vector execution unit is not as fancy, just useless multithreading, no systolic The prefetch is supposed to be done by DMA engine that is manually controlled by software  System architecture  The vector accelerator only has L1 I$, no D$  Don&rsquo;t need to maintain cache coherency Lots of vector registers, 512 in total, each is 64x2x4=512-bit Wide bus connection to L2$, to provide higher bandwidth   Uncached TileLink between L1 I$ (both scalar processor and vector processors) and L2$ Cached TileLink between L1 D$ (only in scalar processor)  L2$ maintains directory bits, which determines the states of corresponding cache line (JW: maybe something like MESI bits)   Operations of L2$, supported by TileLink protocol (&ldquo;Productive Design of Extensible On-Chip Memory Hierarchies&rdquo;)  Sub-cache-block accesses Data prefetch requests  Read from DDR, don&rsquo;t need to send back to the requester   Atomic memory operations  ALU inside L2 cache banks      Decoupling  Access/execute decoupling Decoupled vector arch Cache refill/access decoupling  Vector Command Queue (VCMDQ)  Instruction fetch is handled by scalar processor, and then sent to VCMDQ  There is explicity defined start vf and stop vstop instructions that flags the begin and end of vector instructions  JW: why is that necessary?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/blog/arch/2019-01-03-hwacha-accelerator/" />
+<meta property="article:published_time" content="2019-01-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-01-03T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Huwcha Accelerator architecture</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2019-01-03T00:00:00Z">January 03, 2019</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg><span class="meta__text"><a class="meta__link" href="/categories/arch/" rel="category">arch</a>
+	</span>
+</div></div>
+		</header><div class="content post__content clearfix">
+			<p>From the reading of this paper, &ldquo;The Hwacha Microarchitecture Manual, Version 3.8.1&rdquo;, I found out that our Pygmy ES1 architecture is almost the same idea, just not as fancy.</p>
+<ul>
+<li>We don&rsquo;t have cache coherency, because we operate on unified physical memory space</li>
+<li>The vector execution unit is not as fancy, just useless multithreading, no systolic</li>
+<li>The prefetch is supposed to be done by DMA engine that is manually controlled by software</li>
+</ul>
+<h2 id="system-architecture">System architecture</h2>
+<ul>
+<li>The vector accelerator only has L1 I$, no D$
+<ul>
+<li>Don&rsquo;t need to maintain cache coherency</li>
+<li>Lots of vector registers, 512 in total, each is 64x2x4=512-bit</li>
+<li>Wide bus connection to L2$, to provide higher bandwidth</li>
+</ul>
+</li>
+<li>Uncached TileLink between L1 I$ (both scalar processor and vector processors) and L2$</li>
+<li>Cached TileLink between L1 D$ (only in scalar processor)
+<ul>
+<li>L2$ maintains directory bits, which determines the states of corresponding cache line (JW: maybe something like MESI bits)</li>
+</ul>
+</li>
+<li>Operations of L2$, supported by TileLink protocol (&ldquo;Productive Design of Extensible On-Chip Memory Hierarchies&rdquo;)
+<ul>
+<li>Sub-cache-block accesses</li>
+<li>Data prefetch requests
+<ul>
+<li>Read from DDR, don&rsquo;t need to send back to the requester</li>
+</ul>
+</li>
+<li>Atomic memory operations
+<ul>
+<li>ALU inside L2 cache banks</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="decoupling">Decoupling</h2>
+<ul>
+<li>Access/execute decoupling</li>
+<li>Decoupled vector arch</li>
+<li>Cache refill/access decoupling</li>
+</ul>
+<h2 id="vector-command-queue-vcmdq">Vector Command Queue (VCMDQ)</h2>
+<ul>
+<li>Instruction fetch is handled by scalar processor, and then sent to VCMDQ
+<ul>
+<li>There is explicity defined start <code>vf</code> and stop <code>vstop</code> instructions that flags the begin and end of vector instructions
+<ul>
+<li>JW: why is that necessary?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="vector-execution-unit-vxu">Vector Execution Unit (VXU)</h2>
+<ul>
+<li>In a <strong>systolic</strong> style
+<ul>
+<li>4 banks in total, each bank has 256-entry 2x64-bit vector register file, as well as ALUs</li>
+<li>from the block diagram, these ALUs are only add/subtration/shift operations. Multi-cycle integer multiplier/divider, and floating point operations are outside of each bank and shared by all 4 banks via a crossbar.
+<ul>
+<li>JW: I don&rsquo;t think this is good for ML applications. They are trying to make it more generic, so to improve on this, we could take the same micro-architecture but simplify it as well as putting more ML (basically MAC) into it.</li>
+</ul>
+</li>
+<li>As operation flows through the banks, natually chain different operations together.
+<ul>
+<li>JW: the chaining is useful because we have limited shared function unit, such as IMUL/IDIV. For function units that are exclusive to bank, I don&rsquo;t see the benifit.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Predicate is used for simple branch and etc.</li>
+</ul>
+<h2 id="vector-memory-unit-vmu">Vector Memory Unit (VMU)</h2>
+<ul>
+<li>It&rsquo;s based TileLink protocol</li>
+<li>Vector Load Unit (VLU)
+<ul>
+<li>Opportunistic writeback mechanism: return as soon as the data is back, no re-order buffer.</li>
+<li>Simultaneously manage multiple operations to avoid artificial throttling of successive loads: too many requests will drive performance down</li>
+</ul>
+</li>
+<li>Vector Store Unit (VSU)
+<ul>
+<li>Vector Store Data Queue (VSDQ)</li>
+</ul>
+</li>
+</ul>
+<h2 id="vector-runahead-unit-vru">Vector Runahead Unit (VRU)</h2>
+<ul>
+<li>This block process all the vector load/store instructions in the prefetch queue from the scalar processor, generate address and send prefetch requests to L2$.
+<ul>
+<li>Prefetch request doesn&rsquo;t return data to requester.</li>
+<li>In ideal world, it will hide the memory access latency.</li>
+</ul>
+</li>
+<li>When from a cold start, it skips the first few load/store to run ahead of the VMU, until it reaches too far ahead, determined by the number of load/store operations that hasn&rsquo;t been processed by VMU yet, it pauses.
+<ul>
+<li>Cannot run too close, otherwise the memory access latency cannot be hide.</li>
+<li>Cannot run too further ahead, otherwise newly loaded data will force evict the data that&rsquo;s been currently using by the VXU and cause even worse performance panity.</li>
+</ul>
+</li>
+<li>Also to limit using too much of the L2$ bandwidth, prefetch in L2$ only uses up 1/3 of available outstanding access (JW: I think it more likely the MSHR entries which handles any cache miss).</li>
+</ul>
+<h2 id="multilane">Multilane</h2>
+<ul>
+<li>Hwacha support paramerized number of identical lanes, and these lanes work entirely decoupled from one another.</li>
+<li>If the memory needed by each lane aligns to the cache line size, it will be the best, otherwise, there will be some waste of bandwidth to load unnecessary data to the lane.</li>
+<li>JW: curious, how do they manage multilane?
+<ul>
+<li>There is a <strong>master sequencer</strong> who knows the number of lanes out there as well as the vector length. It will dispatch the job to these lanes evenly.</li>
+</ul>
+</li>
+<li>JW: as it discussed in the paper, the lanes work on strip size, which is a unit-stride fasion. If there is any non-unit stride, not only it will waste the bandwidth, but also it will waste the computation resource. <em>So I think it would be a simple dispatch based on unit-stride, the master sequencer will have to consider the stride as well.</em></li>
+</ul>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/blog/arch/2018-12-15-riscv-v-spec/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title">Note of RISC-V Vector ISA Spec v0.6</p>
+		</a>
+	</div>
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/blog/life/2019-01-12-at-the-time-leaving-ours/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title">Give notice to OURS</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

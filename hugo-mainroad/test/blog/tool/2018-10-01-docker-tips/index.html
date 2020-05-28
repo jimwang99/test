@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Docker for EDA - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="Docker for EDA" />
+<meta property="og:description" content="Dockerfile FROMubuntu:16.04COPY ./boot.sh /tmpCOPY ./hello.sh /tmpRUN /bin/bash /tmp/boot.shRUN /bin/bash /tmp/hello.shboot.sh apt-get update; apt-get install -y make autoconf g&#43;&#43; flex bison wget cd /tmp wget https://www.veripool.org/ftp/verilator-4.004.tgz tar xf verilator*.tgz cd verilator* ./configure make # this step will take sometime make install hello.sh cd /tmp/verilator* cd ./example/tracing_c make # it will print out some log, and after finish it will generate a directory in the same directory named &#34;logs&#34; who needs to be saved after container exit Docker how-to notes create a docker image from Dockerfile docker build -t &#34;$(name):$(tag)&#34; ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/blog/tool/2018-10-01-docker-tips/" />
+<meta property="article:published_time" content="2018-10-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-10-01T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Docker for EDA</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2018-10-01T00:00:00Z">October 01, 2018</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg><span class="meta__text"><a class="meta__link" href="/categories/tool/" rel="category">tool</a>
+	</span>
+</div></div>
+		</header><div class="content post__content clearfix">
+			<h2 id="dockerfile">Dockerfile</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dockerfile" data-lang="dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> ubuntu:16.04</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> ./boot.sh /tmp<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> ./hello.sh /tmp<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> /bin/bash /tmp/boot.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> /bin/bash /tmp/hello.sh<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><h2 id="bootsh">boot.sh</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">apt-get update; apt-get install -y make autoconf g++ flex bison wget
+cd /tmp
+wget https://www.veripool.org/ftp/verilator-4.004.tgz
+tar xf verilator*.tgz
+cd verilator*
+./configure
+make <span style="color:#75715e"># this step will take sometime</span>
+make install
+</code></pre></div><h2 id="hellosh">hello.sh</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd /tmp/verilator*
+cd ./example/tracing_c
+make
+
+<span style="color:#75715e"># it will print out some log, and after finish it will generate a directory in the same directory named &#34;logs&#34; who needs to be saved after container exit</span>
+</code></pre></div><h2 id="docker-how-to-notes">Docker how-to notes</h2>
+<h3 id="create-a-docker-image-from-dockerfile">create a docker image from Dockerfile</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker build -t <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>name<span style="color:#66d9ef">)</span><span style="color:#e6db74">:</span><span style="color:#66d9ef">$(</span>tag<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> .; <span style="color:#75715e"># in a directory with Dockerfile</span>
+
+docker run -dit --name <span style="color:#66d9ef">$(</span>name<span style="color:#66d9ef">)</span> <span style="color:#66d9ef">$(</span>name<span style="color:#66d9ef">)</span>:<span style="color:#66d9ef">$(</span>tag<span style="color:#66d9ef">)</span>; <span style="color:#75715e"># -d: detach, -i: interactive, -t: tty</span>
+
+docker ps; <span style="color:#75715e"># use -a to list exited docker; use &#34;docker rm&#34; to remove useless containers</span>
+
+docker exec -it <span style="color:#66d9ef">$(</span>name<span style="color:#66d9ef">)</span> /bin/bash; <span style="color:#75715e"># run bash in guest and connect to it</span>
+
+docker commit -m <span style="color:#e6db74">&#34;install/test verilator-4.004&#34;</span> -a <span style="color:#e6db74">&#34;jw&#34;</span> <span style="color:#66d9ef">$(</span>name<span style="color:#66d9ef">)</span> <span style="color:#66d9ef">$(</span>new_name<span style="color:#66d9ef">)</span>:<span style="color:#66d9ef">$(</span>new_tag<span style="color:#66d9ef">)</span>; <span style="color:#75715e"># -m: message, -a: author, with new name and tag</span>
+
+docker image ls; <span style="color:#75715e"># and the image is 797MB large comparing to eda:0.0&#39;s 116MB; use &#34;docker image rm&#34; to remove useless docker images</span>
+</code></pre></div><h3 id="save-file-to-host">save file to host</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># mount a host dir to guest /mnt/result</span>
+DATE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>date <span style="color:#e6db74">&#39;+%Y%m%d_%H%M%S&#39;</span><span style="color:#e6db74">`</span>
+mkdir result_<span style="color:#e6db74">${</span>DATE<span style="color:#e6db74">}</span>
+docker run -it -v <span style="color:#e6db74">${</span>PWD<span style="color:#e6db74">}</span>/result_<span style="color:#e6db74">${</span>DATE<span style="color:#e6db74">}</span>:/mnt/result eda:0.1 /bin/bash
+
+<span style="color:#75715e"># in guest, copy files to /mnt/result afterwards</span>
+<span style="color:#75715e"># but the files in result_${DATE} will have permission of root:root</span>
+<span style="color:#75715e"># the easiest way to fix the problem is in host do:</span>
+sudo chown -R <span style="color:#66d9ef">$(</span>id -u<span style="color:#66d9ef">)</span> ./result_<span style="color:#e6db74">${</span>DATE<span style="color:#e6db74">}</span>
+sudo chown -R <span style="color:#66d9ef">$(</span>id -g<span style="color:#66d9ef">)</span> ./result_<span style="color:#e6db74">${</span>DATE<span style="color:#e6db74">}</span>
+</code></pre></div><h3 id="stop">stop</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker stop <span style="color:#66d9ef">$(</span>name<span style="color:#66d9ef">)</span>
+</code></pre></div>
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/blog/design/2018-03-31-case-study-glitch-free-clock-mux/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title">Case Study: Glitch Free Clock Mux</p>
+		</a>
+	</div>
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/blog/tool/2018-10-21-google-cloud-platform-tips/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title">GCP (Google Cloud Platform)</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

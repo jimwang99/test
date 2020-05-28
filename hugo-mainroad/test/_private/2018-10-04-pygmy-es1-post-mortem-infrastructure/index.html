@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Pygmy ES1 Post Mortem: Infrastructure - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="Pygmy ES1 Post Mortem: Infrastructure" />
+<meta property="og:description" content="Coding Style Parameterization One very important and useful thing I&rsquo;ve learned in OURS is to create highly parameterized design. It will take a little bit more effort while writing up the code, but will save a lot of more time later on, especially in a startup whose spec changes rapidly.
+One good weapon you can use to improve parameterization of your design is generate block. It doesn&rsquo;t only support for loop, but also if else statement." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="//localhost:1313/_private/2018-10-04-pygmy-es1-post-mortem-infrastructure/" />
+<meta property="article:published_time" content="2018-10-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-10-04T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Pygmy ES1 Post Mortem: Infrastructure</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2018-10-04T00:00:00Z">October 04, 2018</time></div></div>
+		</header><div class="content post__content clearfix">
+			<h2 id="coding-style">Coding Style</h2>
+<h3 id="parameterization">Parameterization</h3>
+<p>One very important and useful thing I&rsquo;ve learned in OURS is to create highly parameterized design. It will take a little bit more effort while writing up the code, but will save a lot of more time later on, especially in a startup whose spec changes rapidly.</p>
+<p>One good weapon you can use to improve parameterization of your design is <code>generate</code> block. It doesn&rsquo;t only support <code>for</code> loop, but also <code>if else</code> statement. But remember to add name for those blocks, otherwise it will be <code>unamed</code> and sometimes violate lint rules.</p>
+<p>Another weapon is <code>ifdef</code> from ancient time. It&rsquo;s still useful because it&rsquo;s very straight-forward and can use pre-processor tool to process it before delivering to customer.</p>
+<p>In our design, our cache, both L1 and L2, are highly parameterized using <code>parameter</code>. It makes the design very easy to change size, way-association, bank and etc. Our RISC-V CPU is using <code>ifdef</code> a lot to support different instruction subset selection, even data width selection between 32-bit and 64-bit. Our network fabric</p>
+<p>But there are some drawbacks:</p>
+<ol>
+<li>It does cost some more engineering time to make your design parameterized, and the debug will be more painful.</li>
+<li>Verification need to cover more parameters to be complete.</li>
+<li>To make parameterization works well and efficient, we have to use new SystemVerilog keywords and features, such as struct, typedef, multi-dimension array (even as port). They are not very popular among RTL design and verification engineers, more importantly, they are not very well supported by existing EDA toolchain. The following features are not well supported by FPGA synthesis tool Vivado, as of Oct. 2018, and caused a lot of problems. Workarounds are necessary, but we eventually abandoned them in our design.
+<ol>
+<li>Interface array</li>
+<li>Multi-dimension array as port</li>
+</ol>
+</li>
+</ol>
+<h3 id="flip-flop">Flip-flop</h3>
+<p>We struggled for some time to decide the coding style for the flip-flop instances, sequential block coding style to be more specific. It&rsquo;s important because</p>
+<ol>
+<li>Clock tree power is enormous so we have to apply very aggressive clock gating in our design. To enforce that we need the coding style of flip-flop that EDA tool can understand and automatically generate clock gating cells.</li>
+<li>The reset tree is also important for both functionality and low power, and it&rsquo;s related to flip-flop coding style.</li>
+<li>Function verification needs randomizing the flip-flops&rsquo; initial values. It is extremely for ASIC, because you cannot afford to reset all the flip-flops including the ones on the data path. If we want to use some tools to automatically do that, we need some support on the coding style side.</li>
+<li>The readability and easy-to-code-ability highly rely on the sequential block&rsquo;s coding style. So it cannot be too hard to read.</li>
+<li>This type of coding style is everywhere in the design, and has to be automatically checkable with lint tool or some script.</li>
+</ol>
+<p>Our final decision in OURS is to use <code>always_ff</code> block, but name the flip-flop using <code>dff_</code> and <code>rff_</code> prefix, to distinguish non-reset and reset flip-flop. Then use lint tool, such as Spyglass, to check this coding style using some custom rule. It&rsquo;s based on the following reasons:</p>
+<ol>
+<li>The readability is preserved as much as possible.</li>
+<li>We don&rsquo;t need to do much changes to the legacy code.</li>
+</ol>
+<p><strong>After some time, I found out that the idea is good, but too ideal.</strong></p>
+<ol>
+<li>It&rsquo;s not possible to enforce clock gating coding style. OK, it&rsquo;s always very hard to enforce that if you don&rsquo;t have proper code review.</li>
+<li>If you want to make some global changes, it&rsquo;s very hard. For example, if you want to change reset from sync to async, or from high active to low active.</li>
+<li>Randomization is still hard to do, which need external tool&rsquo;s help.</li>
+</ol>
+<p>So the following probably is a better way to do:</p>
+<ol>
+<li>Use ``define<code>to define some macros that has the</code>always_ff` block
+<ol>
+<li>Using ``define` is better that using module which seems to be clearer for RTL designer is that you don&rsquo;t want to have a module list tree that has hundreds or thousands of flip-flop instances before instances that you really want to find.</li>
+<li>But it really needs thorough testing to make sure the define doesn&rsquo;t create any kind of violations at all.</li>
+</ol>
+</li>
+<li>And initial block in the macro that randomize the value of the flip-flop if some <code>plusargs</code> is presented.</li>
+</ol>
+<h3 id="logic-vs-reg-and-wire"><code>logic</code> vs. <code>reg</code> and <code>wire</code></h3>
+<p>One great feature that has been introduced into SystemVerilog (SV) is <code>logic</code> keyword. Then you don&rsquo;t need to separate <code>reg</code> for register and <code>wire</code> for wire explicitly anymore. But it causes another problem for randomization. In verification, sometimes &ldquo;x&rdquo; and &ldquo;x&rdquo; propagation is not good enough to catch all the potential bugs that are caused by non-proper initialization (because we cannot put all the flops under reset which will take too much more resources). So we need to explicitly initialize flip-flops (registers) and memories (SRAMs and etc.) to random 1 or 0 to mimic the real ASIC chip behavior. Unfortunately, EDA tool, as of Oct 2018, cannot distinguish <code>reg</code> type and <code>wire</code> type automatically if we only used <code>logic</code> to describe them. And <code>wire</code> type signals cannot be initialized because it will be multi-driven (or don&rsquo;t use <code>always_comb</code>).</p>
+<p>But the problem is to use <code>typedef</code> and <code>struct</code> to parameterize the RTL design, <code>logic</code> is inevitable. So I&rsquo;d propose to use some naming convention to separate out flip-flop and wire signals. We used <code>dff_</code> to flag non-reset flip-flop, and <code>rff_</code> to flag reset flip-flop.</p>
+<p><strong>Update: 2018-10-06 Sat</strong> after looking through the document, I didn&rsquo;t see any problems with <code>-vcs+initreg+random</code> at all, with either <code>logic</code> or <code>always_comb</code>. So I reserve about this issue.  And with the proposal from previous section, <em>flip-flop</em>, there will be no problem using <code>logic</code> at all.</p>
+<h2 id="interface">Interface</h2>
+<p>Interface is something that verification engineers really like, and according to the documents there are a lot of benefits to use interface in RTL. But,g a really big but, the reality is not saying the same thing. Nowadays, as of Oct 2018, most of the tools don&rsquo;t support interface, especially interface array very well. EDA toolchain is weird, because even most of them support some feature, but one key tool doesn&rsquo;t support it, it will be really hard for the RTL engineer to use it.</p>
+<p>And I&rsquo;d say interface array is very useful and it has to be supported by all the EDA tool, otherwise don&rsquo;t even bother to use interface. Why? Because to make the design parameterized, interface has to be array for some modules like network-on-chip fabric.</p>
+<p>Then what we should do to make integration easier? I propose to use &ldquo;struct packed&rdquo; instead. And remember to put data and control signals separately in different structs, and put valid/ready like signals outside of the struct. Then we can reset control signals, but keep data signals not reset. It&rsquo;s really helpful for speed up coding and debug.</p>
+<h2 id="reset">Reset</h2>
+<p>This series of log are about my postmortem thinking about Pygmy ES1 tape-out. So most of them are about the mistakes that we&rsquo;ve made, because they are persistent in my memory. This one is another mistake we&rsquo;ve made. It&rsquo;s not very serious but indeed take us sometime to change the coding style afterwards.</p>
+<p>When we started our RTL coding, we argued about the polarity of reset and clock signals. In Marvell, we always use falling edge triggered flip-flop, because falling edge is faster than rising edge before 16nm process, so it will give you slightly better timing advantage for setup and hold time. But in the discussion, it&rsquo;s very hard to use falling edge as active clock edge, so even between senior engineers we have to do some translation in our head (although I&rsquo;m again amazed by the nature of human brain because there is literally no differences between rising edge and falling edge as active clocking edge). More importantly, since 16nm FinFET, the speed differences for PMOS and NMOS can be ignored. So we decided to use rising edge as active clocking edge. There is no regret about that. Although I do think we need to use macros to define sequential blocks so that if we want to change this kind of coding style, it&rsquo;ll be much faster.</p>
+<p>But the reset is different. In most of the ASIC design, reset is low voltage level enable, which means when reset signal is low, circuits are in reset mode. It&rsquo;s kind of against intuition but I haven&rsquo;t seen any exception except for FPGA design. In FPGA design example code, they are all using active high, which means when reset signal is high, circuits are in reset mode. We actually followed the FPGA coding style in our ES1.</p>
+<p>Later, in the board design, we found out why ASIC chip should use active low reset. The phenomenal is there is no active high reset POR (power on reset) components out there, and this gave me some serious thinking about why.</p>
+<ol>
+<li>We know that free running in ASIC chip is bad and may cause some serious issues especially in analog/mix-signal block.</li>
+<li>While power ramp-up, on system level it&rsquo;s a very slow process, which might last for hundreds of micron-seconds.</li>
+<li>When an ASIC is powered up but its reset is still low voltage that hasn&rsquo;t fully ramp-up yet, that ASIC is in free running mode.</li>
+</ol>
+<p><strong>So we then decided to change all the reset to active low.</strong></p>
+<p>This discussion also leads to another part of thinking, maybe over-thinking anyway, regarding to sync reset vs. async reset. Sync reset indeed consumes lower area and power, but needs clock to function. Due to the same reason above, some critical circuits that can damage itself or other devices if its input programmable parameters are wrong, then these parameter registers <strong>has to use async reset</strong>.</p>
+<h3 id="clock-gating">Clock gating</h3>
+<p>As everybody understand, the clock tree power consumption is enormous, so clock gating is one of the most efficient way to control its power consumption with very minimum cost. We are not doing very well in Pygmy ES1 because the clocking gating strategy is highly rely on EDA tools to insert clock gating cells automatically, and unfortunately it didn&rsquo;t do a very good job as we expected.</p>
+<p>According to my earlier work experience, the right way to do clock gating is manually insert clock gating cells explicitly on the clock signal and use the gated clock in <code>always_ff</code> block. To be optimum, 2 or 3 levels of clock gating cells are manually planned and inserted. For most of the design, 2 levels are enough and manageable.</p>
+<h2 id="eda">EDA</h2>
+<h3 id="eda-license">EDA License</h3>
+<p>We bought EDA licenses as well as IPs from Synopsys China, which is significantly cheaper than their US HQ. But the problem is that customer service, such as ticket submission and process, is preferred in China, which has half day time difference with us and lack of real local support that I&rsquo;ve experience working with Cadence on Voltus setup.</p>
+<p>Another good thing about this deal is that along with lower price, they can give us temporary licenses regularly. And because we use their backend design service, they can also give us 2 free licenses during the backend design cycle for ALL the backend tools, which are very very expensive. So frontend tools we are covered by occasionally applied temporary keys, and backend tools by design service.</p>
+<p>With pull-down licenses (the term they use for deduct the cost of certain tools from the money pool we gave to them), we have different sources and different expired date of licenses. It requires automatic <strong>license management tool</strong> to manage this and remind the administrators about certain tools are going to expire in ahead of time. Because it takes time (usually 2 or 3 days fastest) to get license update.</p>
+
+		</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="John Doe avatar" src="/img/avatar.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About John Doe</span>
+	</div>
+	<div class="authorbox__description">
+		John Doe&rsquo;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.
+	</div>
+</div>
+
+<nav class="pager flex">
+	<div class="pager__item pager__item--prev">
+		<a class="pager__link" href="/_private/2017-04-03-interview-with-continental-automotive-in-santa-barbara/" rel="prev">
+			<span class="pager__subtitle">«&thinsp;Previous</span>
+			<p class="pager__title">Interview with Continental Automotive in Santa Barbara</p>
+		</a>
+	</div>
+	<div class="pager__item pager__item--next">
+		<a class="pager__link" href="/_private/2019-01-15-anyka-post-mortem-official-version/" rel="next">
+			<span class="pager__subtitle">Next&thinsp;»</span>
+			<p class="pager__title">Anyka Project Post-mortem (official version)</p>
+		</a>
+	</div>
+</nav>
+
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?port=1313&mindelay=10&v=2" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>_privates - Mainroad</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		<meta property="og:title" content="_privates" />
+<meta property="og:description" content="John Doe&#39;s Personal blog about everything" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="//localhost:1313/_private/" />
+<meta property="og:updated_time" content="2019-01-22T00:00:00+00:00" />
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="alternate" type="application/rss+xml" href="/_private/index.xml" title="Mainroad">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="Mainroad" rel="home">
+				<div class="logo__title">Mainroad</div>
+				<div class="logo__tagline">Just another site</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/">
+				
+				<span class="menu__text">About Me</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/project/">
+				
+				<span class="menu__text">My Projects</span>
+				
+			</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/blog/">
+				
+				<span class="menu__text">Blog</span>
+				
+			</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main list" role="main">
+	<header class="main__header">
+		<h1 class="main__title">_privates</h1>
+	</header><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/_private/2019-01-22-pygmy-es1-post-mortem-design/" rel="bookmark">
+			Pygmy ES1 Post-mortem: Design
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2019-01-22T00:00:00Z">January 22, 2019</time></div></div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		CPU I-Cache The current problem with I-Cache and the IF/ID stages are that they are designed to be highly coupled, but actually I put I-Cache module outside of IF, making the whole flow-control signals very weird.
+To improve current design:
+ First of all, put the I-Cache back into IF, and make the generation of control flow signals more natual Then decouple IF from ID/EX/MA/WB stage, as front-end and back-end. This front-end don&rsquo;t need to prefetch too much, just output to a 2-entry FIFO would be enough for this 5-stage in-order issue pipeline.
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/_private/2019-01-18-anyka-post-mortem-self-version/" rel="bookmark">
+			Anyka project post-mortem (my own summary)
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2019-01-18T00:00:00Z">January 18, 2019</time></div></div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		这个项目最开始是由Gary介绍的，因为Anyka的老板是他清华的同学。Anyka是一个非常典型的广东民营企业，以设计制造各种电子设备上的SoC为主营业务，开发团队涵盖了IC设计、流片、固件等各个方面。整个公司有20多年的历史，可谓历史悠久了。但是由于人员流动很大，工程师团队的年龄结构比较新。稍有经验一点的工程师都被委以重任。
+Feature definition 在feature definition的阶段是由老谭亲自对接的。他过去对方公司，经过了仅仅一个下午的技术讨论，就自认为摸清楚了对方所有的要求，并且对客户做出了“我们都能做”的承诺。这个会议我是通过电话会议全程参与，其中提供的意见仅仅是对我们当时有的功能提供了一些参考意见。会后我不断提醒老谭说，我们当时已有的ORV64跟对方所要求的32-bit CPU在feature上有较大的差距，不是说不能做，而是开发时间可能比较长。老谭一再强调，这是非常友好的客户，跟他们老总吃顿饭就能搞定的，因为他们老总个人要投资我们在中国的公司。
+ 反思：当时我的心情就是，如果项目搞定了不是我的功劳，因为这是Gary带来的“友好客户”，是老谭“吃了顿饭搞定的”；如果项目搞砸了就是我的过错，因为“这么友好的公司”都搞砸了。所以对于决策层而言，这种话千万不能说。
+ 在后期我跟对方具体的沟通过程中，我不断发现对方在基础假设上就跟我们有比较大的差距。因为他们使用ARM系统多年，积累下来了大量的使用习惯和源代码，跟我们当时start-from-scratch design的设计理念有蛮大的差距。这个差距一方面是因为他们不想更换自己的使用习惯和源代码（又有哪个客户会愿意呢？），另一方面也是因为我们设计第一版的时候的那种“草台班子”气质太严重，与主流的设计（其实就是ARM的设计）有比较大的出入。同时Anyka又已经跟SiFive中国分部先期接触过了，所以他们对这个CPU IP的要求是比较高的，在功能完备性和整体稳定性方面。
+Feature definition的前期，我曾经去过客户公司，但仅仅在对方公司呆了3天时间（还是在我的强烈要求下多呆了半天），而且是严重jet lag的状态下。主要的时间是花在了适配对方的系统上面了。只有比较少的时间和精力来跟对方对接feature list。这其中我犯了一个明显的错误就是没有将会议中面对面交谈的所有细节都记录并以会议纪要的形式发给对方进行确认，这导致了后期我们又在feature list的争执上花了不少时间和精力。其中我发现一个很有意思的地方，他们的工程师在“领导”在场的情况下和不在场的情况下所提出的意见是不一样的。在领导在场的情况下，领导定调之后工程师不发一言；在领导不在场的情况下，工程师表示可以通融的地方很多，很多feature都不是必须的，或者有明显的优先级排序。
+ 反思：对feature list的定义需要高度重视，面对面的交流远远胜过电话沟通；跟工程师的直接沟通远胜过形式大于内容的“高层会议”；不形成决议，绝不离开。
+ Schedule definition Schedule definition的过程就更耐人寻味了，这个也是我个人认为的，整个项目中最大的败笔。这个败笔的原因是我妥协了，我尝试着去用open-minded的心态接受老谭提出来的schedule。
+在跟客户沟通feature list的过程中，对方就提出了要在3个月后流片的想法，使用的是SMIC 110nm的工艺。当时我就懵了……因为根据所给出来的feature list，能否在3个月完成design ande verification都不好说，何来直接流片呢？老谭当时给我的指示是，先答应着，根据对方的流片日期从后往前推给一个schedule，然后先给对方一个MVP (minimum viable product)，之后再做迭代。现在看来，这完全是针对内部客户的一种做法，而且是有比较先进的管理理念的公司的一种做法。后期对方针对我们的这种做法提出了强烈的质疑，认为我们提供的IP不够稳定。再者，这种非常aggressive的schedule是很难避免需要cut corners的，如果是内部客户，这种为了schedule而cut corners的做法或许能够得到理解和配合，但是对于外部客户，因为利益不一致，所以很难达到一致的认同。
+ 反思：这种cut corners的做法对于外部客户是很难得到认同的，因为对方选择你的芯片或者IP是为了给项目增值，而不是给项目减分的。况且对方还有更多的其他的选择，并不是非得选你的产品。这种思维模式是很难在市场上立足的。
+ 那么这种倒逼回来的schedule是否最后就成立了呢？故事的结局是悲剧性的。因为不仅这种schedule是不可能达到的，而且在之后的过程中我们不断发现由于基本假设不同所导致的新的feature在不断涌现，导致我们的deliver schedule在不断往后推迟，直到客户失去信心为止。Gary在总结会上给我们讲了一个故事，华为的故事。他说道，在一个很小的细分市场的设备的竞争中，华为派出了30名工程师现场办公，Cisco需要层层报批历经几个月时间才能做的update，华为第二天就能够给出来。这是华为适应市场的一个很好的例子。但是他忘记了一点，华为在已经有了很好的基础的情况下（至少东西做出来了），还派了30名工程师现场办公。30名啊，我们只有不到3个人。我是100% design，Shrikant是20% design 20% verification，Ricardo是50% design，因为我们同时还在忙着ES1的bringup，以及ES1X的设计。
+ 反思：对于外部客户的schedule需要加上比较大的buffer。如果做不了，真的就不要做，而不是像这样做砸了之后损坏自己的声誉和工程师的信心。
+  反思：我本人在定schedule的时候还是比较有自己的自信的，而且一般都比较现实，并不是抱着故意漫天要价的心态。这一点在Marvell的时候得到了验证。在Manish做我的manager的时候，他常常会在我的schedule上加上更多的buffer；在他走之后，PSM会议上我所负责的项目从来不是关键路径上的单元。所以，今后我也要对自己定的schedule有自信，不能够盲从什么狗屁open-minded。
+ 这里面还有一个非常狗血的经历。对方提出来说频率太低，无法满足他们的需求，所以我们需要修改micro-architecture，decouple I-Cache和D-Cache，以提高频率。我提出来说需要3周时间来完成所有的design and verification，基于的理由是目前的L1 cache是highly coupled within pipeline，要更改并且充分验证之后才能给客户。结果老谭说“3天”。我擦，我从来没见过这种讨价还价的惊天之举。如果说从3周压缩到2周我或许还能咬咬牙接受，但是压缩到3天我就觉得有点无理取闹了。这个可能就是我的tipping point。
+Implementation 在具体的实现过程中，我个人也犯了很多技术上的错误。
+ 原有的ORV CPU的架构过于简单，没有使用现代的更先进的流水线设计  没有decouple前端和后端，在fetch阶段做了很多的decoding，这样虽然性能和能效能够得到一定程度的提升，因为减少了jump的代价、减少了kill的几率，但是导致后期加入的支持RVC的代码严重影响了本来就比较严重的I-Cache的关键路径。尤其是在SMIC 110nm工艺情况下，关键路径太长，不得不在之后更改设计来达到200MHz的频率要求。 没有decouple LSU和流水线本身，导致D-Cache本身也成为关键路径之一。   处理RVC的代码过于复杂，因为没有想得太清楚就直接开始做了。或者说原本的fetch还比较简单，但是加入RVC的处理之后就复杂得很难debug了。 AHB interface的设计本身还算可以，但是本着快速做出MVP的想法，没有提前跟客户沟通他们的实际需求（不过我记得我说过的，当时在会上客户没有提出反对意见，很可能是因为他们自己都不清楚自己用到了哪些功能） OURSRING的设计本身还算可以，但是没有进行performance test，所以不知道它的bandwidth是否足够强大。   反思：当前的ORV架构必须要改进，否则无法适应市场的需要。
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/_private/2019-01-15-anyka-post-mortem-official-version/" rel="bookmark">
+			Anyka Project Post-mortem (official version)
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2019-01-15T00:00:00Z">January 15, 2019</time></div></div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		By &ldquo;official version&rdquo;, I mean it&rsquo;s for the company and management to view.
+ Technical related Stability is the key  We need real user cases, both hardware and software  How do customers use existing conventional IP or SoC (ARM-based) Before convince customer to adopt our methods, we need to prove it works with their hardware and software environment and can achieve the same goal.   Verification coverage  Our verification coverage is catching up Continue to build verification coverage database on each version code base   Disciplined release with regression suite  Every release has to pass the regression suite first with exactly the same RTL/firmware/environment with customer    User experience should be closer to conventional design (ARM-based)  CPU component  TCM ACP   Interface  AMBA (AXI, AHB, APB) JTAG, QSPI, I2C, SDIO, GPIO   Design for debug  I personally believe this is the weakest point of RISC-V against ARM.
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/_private/2018-10-04-pygmy-es1-post-mortem-infrastructure/" rel="bookmark">
+			Pygmy ES1 Post Mortem: Infrastructure
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2018-10-04T00:00:00Z">October 04, 2018</time></div></div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		Coding Style Parameterization One very important and useful thing I&rsquo;ve learned in OURS is to create highly parameterized design. It will take a little bit more effort while writing up the code, but will save a lot of more time later on, especially in a startup whose spec changes rapidly.
+One good weapon you can use to improve parameterization of your design is generate block. It doesn&rsquo;t only support for loop, but also if else statement.
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/_private/2017-04-03-interview-with-continental-automotive-in-santa-barbara/" rel="bookmark">
+			Interview with Continental Automotive in Santa Barbara
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class="meta__text" datetime="2017-04-03T00:00:00Z">April 03, 2017</time></div></div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		The company This company was founded in Santa Barbara and got acquired by Continental Automotive, which is the second largest automotive supplier in the world based in Germany. People know Continental mostly because of its tire product, or maybe his automobile electronics system. Actually, the branch got acquired is only the commercial part of its original company, the other part is for military which stays independent.
+The branch itself just start to work on the product, and hasn&rsquo;t taped out yet, despite of some testcase basically for the pixel processing unit itself.
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/_private/2019-01-28-key-moments/" rel="bookmark">
+			
+			</a>
+		</h3>
+		
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		
+	</div>
+</article>
+</main>
+
+
+			</div>
+			
+<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="//localhost:1313/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/blog/tool/test-hugo/">Test MainRoad Theme</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-how-to-become-a-multiplier/">How to become a multiplier?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/tech-lead/2020-02-17-improve-engineering-leadership/">Improve in engineering leadership?</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/list/">[RISC-V Architecture Training] Dec. 2019 verion: Full List</a></li>
+			<li class="widget__item"><a class="widget__link" href="/blog/arch/2019-11-28-riscv-architecture-training/lecture-20-isa-basic/">[RISC-V Architecture Training] Basics &amp; Unprivileged Specification</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/arch/">arch</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/architecture/">architecture</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/design/">design</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/flow/">flow</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/industry/">industry</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/life/">life</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/low-power/">low-power</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/ml/">ML</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/note/">note</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/pm/">PM</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/riscv/">riscv</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tech-lead/">tech-lead</a>
+			</li>
+			<li class="widget__item">
+				<a class="widget__link" href="/categories/tool/">tool</a>
+			</li>
+		</ul>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2020 Mainroad.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>
